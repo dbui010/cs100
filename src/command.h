@@ -1,20 +1,28 @@
-#ifndef COMMAND_H
-#define COMMAND_H
+#ifndef Cmd_h
+#define Cmd_h
+#include <unistd.h>
+#include <iostream>
+#include <stdio.h>
+#include <sys/wait.h>
+#include <sys/types.h>
 #include "base.h"
+#include <iostream>
+#include <queue>
+#include <stack>
+using namespace std;
 
-class command: public Base
+class Cmd: public Base
 {
-public:
+  protected:
+  char * command;
+  queue<char *> arg;
 
-    command(char* cm);
-    bool execute(); //executes the command...
-    ~command();
+  public:
+  Cmd();
+  Cmd(string);
+  ~Cmd();
 
-private:
-    char* cmd; //command and arguments
-    bool completed; //status of the cmd (if it failed or not), might not be necessary
+  virtual bool execute();
 
 };
-
-#endif // COMMAND_H
-
+#endif
