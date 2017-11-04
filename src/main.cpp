@@ -56,7 +56,7 @@ void separateConnectors(string &);
 char** tokenize_input(string &);
 queue<string> tokenize(string &);
 
-Base* generateTree(queue<string>& Q);
+Base* generateTree(vector<string> v);
 Base* exitorCommand(string s);
 
 int main () {
@@ -65,14 +65,23 @@ int main () {
     {
         string input;
         queue<string> postOrder;
+	vector<string> v;
         Base* head;
         //char **args;
         //int argsSize = 0;
-
         readCommandLine(input);
+ 
         separateConnectors(input);
         postOrder = tokenize(input);
-        head = generateTree(postOrder);
+	while(!postOrder.empty())
+        {
+             v.push_back(postOrder.front());
+             postOrder.pop();
+        }
+
+	
+        head = generateTree(v);
+
         head->execute();
         delete head;
         head =NULL;
@@ -261,76 +270,69 @@ Base * exitorCommand(string s)
 
 }
 
-Base* generateTree(queue<string>& Q)
+Base* generateTree(vector<string> v)
 {
-//Assume its already in postfix
-//  vector<string> v = infix_to_postfix(vec);
   //this stack will create our tree
-  stack<Base*> S;
+  stack<Base *> shell;
   unsigned index = 0;
-  while(!Q.empty())
+  while(index < v.size() )
   {
-      //if || op
-    if(Q.front() == "||")
+    if(v.at(index) == "||")
     {
-      if(S.size()>1)
+      if(shell.size()>1)
       {
-        Base* r = S.top();
-        S.pop();
-        Base* l = S.top();
-        S.pop();
-        Base* temp = new orOp(l,r);
-        S.push(temp);
+        Base * r = shell.top();
+        shell.pop();
+        Base * l = shell.top();
+        shell.pop();
+        Base * temp = new orOp(l,r);
+        shell.push(temp);
       }
     }
-    //if && op
-    else if(Q.front() == "&&")
+    else if( v.at(index) == "&&")
     {
-      if(S.size()>1)
+      if(shell.size()>1)
       {
-        Base* r = S.top();
-        S.pop();
-        Base* l = S.top();
-        S.pop();
-        Base* temp = new AndOp(l,r);
-        S.push(temp);
+        Base * r = shell.top();
+        shell.pop();
+        Base * l = shell.top();
+        shell.pop();
+        Base * temp = new AndOp(l,r);
+        shell.push(temp);
       }
     }
-
-    //if ; op
-    else if( Q.front() == ";")
+    else if( v.at(index) == ";")
     {
-      if(S.size()>1)
+      if(shell.size()>1)
       {
-        Base* r = S.top();
-        S.pop();
-        Base* l = S.top();
-        S.pop();
-        Base* temp = new SemiColon(l,r);
-        S.push(temp);
+        Base * r = shell.top();
+        shell.pop();
+        Base * l = shell.top();
+        shell.pop();
+        Base * temp = new SemiColon(l,r);
+        shell.push(temp);
       }
     }
-
-
-    //if command
     else
     {
       //will create a cmd node, exit node, or test node
-      Base* temp = exitorCommand(Q.front());
-      S.push(temp);
+      Base * temp = exitorCommand(v.at(index));
+
+      shell.push(temp);
     }
     index++;
   }
   //if there is a node, return it
-  if(S.size())
+  if(shell.size())
   {
-  return S.top();
+  return shell.top();
   }
   //if there is not, then create an empty node to execute
   else
   {
-    Base* p = new Cmd();
+    Base * p = new Cmd();
     return p;
   }
 }
+
 
