@@ -1,3 +1,0 @@
-epic:
-
-"The user should be able to execute a one-line Bash command by entering the command on a keyboard."
