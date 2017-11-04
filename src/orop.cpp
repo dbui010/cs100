@@ -1,18 +1,23 @@
 #include "orop.h"
+#include "connector.h"
 
 orOp::orOp()
 {
 
 }
 
+
 bool orOp::execute()
 {
-    if(!(leftChild->execute()))
-    {
-        rightChild->execute();
-        return true;
-    }
-    return false;
+    bool status = true;
+      if(!leftChild->execute())
+      {
+        if(!rightChild->execute())
+        {
+          status = false;
+        }
+      }
+      return status;
 }
 
 orOp::~orOp()

@@ -6,6 +6,7 @@ class AndOp:public connector
 {
 public:
     AndOp();
+    AndOp(Base* left, Base* right):connector(left,right){}
     bool execute();
     /*
      * execute summary:
@@ -19,5 +20,4 @@ public:
 };
 
 #endif // ANDOP_H
-
 

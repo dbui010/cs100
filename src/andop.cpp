@@ -16,9 +16,18 @@ bool AndOp::execute()
  *                                    */
 
     if(leftChild->execute()){
-        rightChild->execute();
-        return true;
-    }//if it passes
+        if(rightChild->execute())
+	{
+        	return true;
+	}
+	else
+	{
+		return false;
+	}
+    }
+
+//if it fails
+
     return false;
 
 

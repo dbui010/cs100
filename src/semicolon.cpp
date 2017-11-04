@@ -1,5 +1,6 @@
 #include "semicolon.h"
 
+
 SemiColon::SemiColon()
 {
 
@@ -8,8 +9,9 @@ SemiColon::SemiColon()
 bool SemiColon::execute()
 {
     leftChild->execute();
-    rightChild->execute();
-
+    if(rightChild->execute())
+	return true;
+    return false;
 }
 
 SemiColon::~SemiColon()
