@@ -1,0 +1,8 @@
+$echo a; echo b && ls
+a
+b
+andop.cpp  base.h       command.o      main.cpp  orop.h         semicolon.h
+andop.h    base.o       connector.cpp  main.o    orop.o         semicolon.o
+andop.o    command.cpp  connector.h    makefile  rshell
+base.cpp   command.h    connector.o    orop.cpp  semicolon.cpp
+$
