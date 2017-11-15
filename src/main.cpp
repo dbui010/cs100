@@ -73,8 +73,10 @@ int main () {
  
         separateConnectors(input);
         postOrder = tokenize(input);
+	cout<<"========================"<<endl<<endl;
 	while(!postOrder.empty())
         {
+	     cout<<postOrder.front()<<endl;
              v.push_back(postOrder.front());
              postOrder.pop();
         }
