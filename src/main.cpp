@@ -51,28 +51,38 @@ using namespace std;
  *
  */
 
-void readCommandLine(string &);
-void separateConnectors(string &);
-char** tokenize_input(string &);
-queue<string> tokenize(string &);
 
 Base* generateTree(vector<string> v);
 Base* exitorCommand(string s);
+
+void readCommandLine(string &);
+bool isBalancedParentheses(string &);
+void separateConnectors(string &);
+void addHashtag(string &);
+void tokenizeInOrder(string &, queue<string> &);
+queue<string> tokenizePostOrder(queue<string>);
+bool isOperator(string);
+bool isParenthesis(string);
+
 
 int main () {
 
     while(1)
     {
         string input;
+        queue<string> inOrder;
         queue<string> postOrder;
 	vector<string> v;
         Base* head;
         //char **args;
         //int argsSize = 0;
         readCommandLine(input);
- 
+ 	if(!isBalancedParentheses(input)) {
+     		return 1;
+        }
         separateConnectors(input);
-        postOrder = tokenize(input);
+	tokenizeInOrder(input,inOrder);
+	postOrder = tokenizePostOrder(inOrder);
 	while(!postOrder.empty())
         {
              v.push_back(postOrder.front());
@@ -96,9 +106,8 @@ int main () {
     return 0;
 }
 
-void readCommandLine(string &input) {
+void readCommandLine(string& input) {
     cout << "$ ";
-
     // Read the line of command from user
     getline(cin,input);
 
@@ -108,7 +117,30 @@ void readCommandLine(string &input) {
     }
 }
 
-void separateConnectors(string &input) {
+bool isBalancedParentheses(string& input) {
+    //Iterate through input to keep track of parentheses
+    int checkBalance = 0;
+    for (unsigned i = 0; i < input.size(); i++) {
+        if (input.at(i) == '(') {
+            checkBalance++;
+        }
+        else if (input.at(i) == ')') {
+            checkBalance--;
+            if (checkBalance < 0) {
+                cout << "ERROR: Left parenthesis must come "
+                     << "before right parenthesis." << endl;
+                return 0;
+            }
+        }
+    }
+    if (checkBalance) {
+        cout << "ERROR: Number of left and right parentheses "
+             << "must be equal." << endl;
+        return 0;
+    }
+    return 1;
+}
+void separateConnectors(string& input) {
     //Read input to a stream so split the commands
     stringstream stream(input);
     string splitInput;
@@ -120,18 +152,13 @@ void separateConnectors(string &input) {
     }
 
     //Add space right before semicolon for all cmd;
-    for (int i = 0; i < vectorSubCMD.size(); i++) {
+    for (unsigned i = 0; i < vectorSubCMD.size(); i++) {
         //Do not include space commands that are size 0
         if(vectorSubCMD.at(i).size() > 0) {
-            //Check if command in vector has a semicolon at the end
-            if(vectorSubCMD.at(i).at(vectorSubCMD.at(i).size()-1) == ';') {
-                vectorSubCMD.at(i).pop_back();
-                vectorSubCMD.at(i).push_back('#');
-                vectorSubCMD.at(i).push_back(';');
-                vectorSubCMD.at(i).push_back('#');
-            }
-            //Check if connector && exists
-            else if (vectorSubCMD.at(i) == "&&") {
+            //Add hashtag if parentheses or semicolon exist
+            addHashtag(vectorSubCMD.at(i));
+            //Add hashtag if connector && exists
+            if (vectorSubCMD.at(i) == "&&") {
                     vectorSubCMD.at(i).pop_back();
                     vectorSubCMD.at(i).pop_back();
 
@@ -140,7 +167,7 @@ void separateConnectors(string &input) {
                     vectorSubCMD.at(i).push_back('&');
                     vectorSubCMD.at(i).push_back('#');
             }
-            //Check if connector || exists
+            //Add hashtag if connector || exists
             else if (vectorSubCMD.at(i) == "||") {
                     vectorSubCMD.at(i).pop_back();
                     vectorSubCMD.at(i).pop_back();
@@ -155,54 +182,81 @@ void separateConnectors(string &input) {
 
     //Empty input string to store vector of subcommands
     input = "";
-    for (int i = 0; i < vectorSubCMD.size(); i++) {
+    for (unsigned i = 0; i < vectorSubCMD.size(); i++) {
 
             input += vectorSubCMD.at(i);
             input += " ";
     }
 }
-queue<string> tokenize(string& input) {
-    //Store subcommands into inOrder queue
-    queue<string> inOrder;
-    //Store connectors into connector stack
-    stack<string> connector;
-    //Store subcommands into postOrder queue
-    queue<string> postOrder;
+
+void addHashtag(string& subCommand) {
+    for (unsigned i = 0; i < subCommand.size(); i++) {
+        if (subCommand.at(i) == '(') {
+            subCommand.insert(i,"#");
+            subCommand.insert(i+2,"#");
+            i += 2;
+        }
+        else if (subCommand.at(i) == ')') {
+            subCommand.insert(i,"#");
+            subCommand.insert(i+2,"#");
+            i += 2;
+        }
+        else if (subCommand.at(i) == ';') {
+            subCommand.insert(i,"#");
+            subCommand.insert(i+2,"#");
+            i += 2;
+        }
+    }
+}
+
+void tokenizeInOrder(string& input, queue<string>& inOrder) {
     //Read input to a stream so split the commands
     stringstream stream(input);
     string splitInput;
 
     //Store the commands into the inorder queue
-    while (getline(stream,splitInput, '#')) {
-        inOrder.push(splitInput);
-    }
-
-    while (!inOrder.empty()) {
-        //Convert from inOrder to postOrder
-        //Check if front of inOrder queue is a command
-        if (inOrder.front() != "&&" && inOrder.front() != "||"
-            && inOrder.front() != ";") {
-            // Pop command from inOrder into postOrder
-            postOrder.push(inOrder.front());
-            inOrder.pop();
+    while (getline(stream,splitInput,'#')) {
+        //Exclude whitespaces and empty string from inOrder queue
+        if (splitInput != "" && splitInput != " ") {
+            inOrder.push(splitInput);
         }
-        //If front of inOrder queue is a connector
-        else {
-            //Push connector to stack if stack is empty
+    }
+}
+
+queue<string> tokenizePostOrder(queue<string> inOrder) {
+    //Store connectors into connector stack
+    stack<string> connector;
+    //Store subcommands into postOrder queue
+    queue<string> postOrder;
+    while (!inOrder.empty()) {
+        if (!isOperator(inOrder.front()) && !isParenthesis(inOrder.front())) {
+            postOrder.push(inOrder.front());
+        }
+        else if(isOperator(inOrder.front())) {
             if(connector.empty()) {
-                connector.push(inOrder.front());
-                inOrder.pop();
+                goto addToStack;
             }
-            //Pop stack connector into postOrder
-            //and pop inOrder connector into stack
-            //if stack is not empty
-            else {
+            while(!isParenthesis(connector.top())) {
                 postOrder.push(connector.top());
                 connector.pop();
-                connector.push(inOrder.front());
-                inOrder.pop();
+                if(connector.empty()) {
+                    goto addToStack;
+                }
             }
+            addToStack:
+            connector.push(inOrder.front());
         }
+        else if(inOrder.front() == "(") {
+            connector.push(inOrder.front());
+        }
+        else if(inOrder.front() == ")") {
+            while(connector.top() != "(") {
+                postOrder.push(connector.top());
+                connector.pop();
+            }
+            connector.pop();
+        }
+        inOrder.pop();
     }
     //Empty the stack into postOrder
     while (!connector.empty()) {
@@ -212,35 +266,23 @@ queue<string> tokenize(string& input) {
 
     return postOrder;
 }
-char** tokenize_input(string& input) {
-    // Convert input string into c-string
-    char* cinput = (char*)input.c_str();
 
-    // Create array of char* pointer to store each cmd/arg/con
-    char **truncateCMD = new char *[input.length()+1];
-    int truncateSize = 0;
-
-    // Tokenize each cmd/arg/con by space delimiter
-    char *p = strtok(cinput," ");
-
-    // Store each cmd/arg/con into the array of char* pointers
-    while (p!=0) {
-        truncateCMD[truncateSize] = p;
-        p = strtok(NULL,"#");
-        truncateSize++;
+bool isOperator(string token){
+    //Return true if string is a connector
+    if(token == "&&" || token == "||" || token == ";") {
+        return true;
     }
-    // Add null at the end of array of pointers
-    truncateCMD[truncateSize] = NULL;
-
-    //Delete c-string to clear memory
-    delete[] cinput;
-
-    for (int i = 0; i < truncateSize; i++) {
-        //cout << truncateCMD[i] << endl;
-    }
-
-    return truncateCMD;
+    return false;
 }
+
+bool isParenthesis(string token) {
+    //Return false if string is a parenthesis
+    if(token == "(" || token == ")") {
+        return true;
+    }
+    return false;
+}
+
 Base * exitorCommand(string s)
 {
   //variables
