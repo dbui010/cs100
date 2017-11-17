@@ -136,4 +136,59 @@ bool ExitCmd::execute()
 
 ExitCmd::~ExitCmd(){}
 
+//===========================TEST========================
+
+TestCmd::TestCmd(string s){
+
+    //assuming parantheses count are checked
+//    char* list = new char [500];
+    int i = 0;
+    argument = s;
+    if(s[0] == '[')
+    {
+        argument = argument.substr(1,argument.find_first_of(']')-1); 
+        //[ commands
+        cout<<"argument: \""<<argument<<"\""<<endl;
+    }
+    else if(s[0]=='t')
+    {
+        //test
+        argument.substr(3, argument.length());
+        cout<<"argument: "<<argument<<endl;
+    }
+
+}
+
+TestCmd::~TestCmd(){}
+bool TestCmd::execute(){
+
+//    struct stat sb;
+////// if not given a flag
+//      if (argc != 2) {
+//           cout<<"(False)"<<endl;
+//           return false;
+//       }
+
+//      if (stat(argv[1], &sb) == -1) {
+//           perror("stat");
+//           return false;
+//       }
+
+////      printf("File type:                ");
+
+//      switch (sb.st_mode & S_IFMT) {
+//       case S_IFDIR:
+//       case S_IFREG:
+//            cout<<"(True)"<<endl;
+//            break;//       default:
+//            cout<<"(False)"<<endl;
+//            break;
+//       }
+
+//      return true;
+
+}
+
+
+
 

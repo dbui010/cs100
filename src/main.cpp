@@ -56,7 +56,7 @@ Base* generateTree(vector<string> v);
 Base* exitorCommand(string s);
 
 void readCommandLine(string &);
-bool isBalancedParentheses(string &);
+bool isBalancedParentheses(string &, char);
 void separateConnectors(string &);
 void addHashtag(string &);
 void tokenizeInOrder(string &, queue<string> &);
@@ -77,26 +77,26 @@ int main () {
         //char **args;
         //int argsSize = 0;
         readCommandLine(input);
- 	if(!isBalancedParentheses(input)) {
-     		return 1;
-        }
-        separateConnectors(input);
+ 	if(isBalancedParentheses(input,'(')) {
+     	
+        
+		separateConnectors(input);
 
-	tokenizeInOrder(input,inOrder);
-	postOrder = tokenizePostOrder(inOrder);
-	while(!postOrder.empty())
-        {
-	     cout<<postOrder.front()<<endl;
-             v.push_back(postOrder.front());
-             postOrder.pop();
-        }
+		tokenizeInOrder(input,inOrder);
+		postOrder = tokenizePostOrder(inOrder);
+		while(!postOrder.empty())
+		{
+		     v.push_back(postOrder.front());
+		     postOrder.pop();
+		}
 
 	
-        head = generateTree(v);
+		head = generateTree(v);
 
-        head->execute();
-        delete head;
-        head =NULL;
+		head->execute();
+		delete head;
+		head =NULL;
+	}
     }
 
     //tokenize(input);
@@ -119,9 +119,11 @@ void readCommandLine(string& input) {
     }
 }
 
-bool isBalancedParentheses(string& input) {
+bool isBalancedParentheses(string& input, char c) {
     //Iterate through input to keep track of parentheses
     int checkBalance = 0;
+
+  if(c == '('){
     for (unsigned i = 0; i < input.size(); i++) {
         if (input.at(i) == '(') {
             checkBalance++;
@@ -141,6 +143,30 @@ bool isBalancedParentheses(string& input) {
         return 0;
     }
     return 1;
+  }
+  if(c == '['){
+    for (unsigned i = 0; i < input.size(); i++) {
+        if (input.at(i) == '[') {
+            checkBalance++;
+        }
+        else if (input.at(i) == ']') {
+            checkBalance--;
+            if (checkBalance < 0) {
+                cout << "ERROR: Left parenthesis must come "
+                     << "before right brackets." << endl;
+                return 0;
+            }
+        }
+    }
+    if (checkBalance) {
+        cout << "ERROR: Number of left and right brackets "
+             << "must be equal." << endl;
+        return 0;
+    }
+    return 1;
+
+  }
+
 }
 void separateConnectors(string& input) {
     //Read input to a stream so split the commands
@@ -295,15 +321,26 @@ Base * exitorCommand(string s)
   strcpy(split,s.c_str());
   val = strtok(split," ");
   //create an exit node
+  //
+  //
+
+
+  if(string(val)== "test" || string(val) == "[")
+  {
+	//create a test object
+	
+	temp = new TestCmd(s);	
+  }
+
   if(string(val) == "exit" || string(val) == "Exit")
   {
-   temp = new Cmd(s);
+	temp = new ExitCmd();
   }
 
   //create a command node
   else
   {
-    temp = new ExitCmd();
+    temp = new Cmd(s);
   }
   if(store != NULL)
   {
