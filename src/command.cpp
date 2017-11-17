@@ -126,3 +126,14 @@ bool Cmd::execute()
   }
   return status;
   }
+
+ExitCmd::ExitCmd(){}
+
+bool ExitCmd::execute()
+{
+    exit(0);
+}
+
+ExitCmd::~ExitCmd(){}
+
+

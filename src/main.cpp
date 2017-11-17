@@ -378,5 +378,3 @@ Base* generateTree(vector<string> v)
     return p;
   }
 }
-
-

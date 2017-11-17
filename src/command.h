@@ -25,4 +25,17 @@ class Cmd: public Base
   virtual bool execute();
 
 };
+
+class ExitCmd: public Base
+{
+
+  public:
+  ExitCmd();
+  ~ExitCmd();
+  bool execute();
+
+
+};
+
+
 #endif
