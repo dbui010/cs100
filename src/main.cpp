@@ -297,7 +297,7 @@ Base * exitorCommand(string s)
   //create an exit node
   if(string(val) == "exit" || string(val) == "Exit")
   {
-   temp = new Cmd(r);
+   temp = new Cmd(s);
   }
 
   //create a command node
