@@ -112,7 +112,7 @@ int main () {
  * Read set of commands from the user. Cut all characters that proceed
  * after the first hashtag, including the hashtag itself. Store rest of
  * commands into the string reference.
- * 
+ *
  */
 void readCommandLine(string& input) {
     cout << "$ ";
@@ -124,9 +124,16 @@ void readCommandLine(string& input) {
         input.erase(input.find("#"),input.length());
     }
 }
+
 /*
- *
- *
+ * Check to to see if the number of left parentheses matches the number of
+ * right parentheses. Return an error message if the numbers do not match.
+ * Also return an error message if a right parenthesis proceeds before a
+ * left parenthesis.
+ * 
+ * e.g. $ (echo a || echo b) && (echo a || echo b) ==> valid output
+ * 	$ (echo a || echo b && (echo a || echo b) ==> invalid output
+ *	$ )echo a || echo b( && (echo a || echo b) ==> invalid output
  */
 bool isBalancedParentheses(string& input, char c) {
     //Iterate through input to keep track of parentheses
