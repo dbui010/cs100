@@ -20,7 +20,7 @@ using namespace std;
 /*
  * Note:
  * So I have the classes available to construct the tree for you
- * Here is the heiarchy for the classes i made
+ * Here is the hierarchy for the classes i made
  *
  * class: Base -> subclasses: command and connector
  * class: connector -> subclasses: AndOp (&&), OrOp(||), SemiColon
@@ -33,7 +33,7 @@ using namespace std;
  * 1,2,3,4 -> commands -> i.e. ls -a, echo b, ls,
  *
  * process:
- * 1 && 2 || 3; 4  //infix
+ * 1 && 2 || 3; 4;  //infix
  * 1 && 2 || 3 ; 4 ; //separating the ; connector from the 3 command AND ; at the end to make it easier to process
  * 1 2 && 3 || 4 ; //postfix
  *
@@ -108,6 +108,12 @@ int main () {
     return 0;
 }
 
+/*
+ * Read set of commands from the user. Cut all characters that proceed
+ * after the first hashtag, including the hashtag itself. Store rest of
+ * commands into the string reference.
+ * 
+ */
 void readCommandLine(string& input) {
     cout << "$ ";
     // Read the line of command from user
@@ -118,7 +124,10 @@ void readCommandLine(string& input) {
         input.erase(input.find("#"),input.length());
     }
 }
-
+/*
+ *
+ *
+ */
 bool isBalancedParentheses(string& input, char c) {
     //Iterate through input to keep track of parentheses
     int checkBalance = 0;
