@@ -235,7 +235,7 @@ void separateConnectors(string& input) {
         }
     }
 
-    //Empty input string to store vector of subcommands
+    //Store subcommands back into string reference
     input = "";
     for (unsigned i = 0; i < vectorSubCMD.size(); i++) {
 
@@ -244,6 +244,13 @@ void separateConnectors(string& input) {
     }
 }
 
+/*
+ * For subCommand strings containing parentheses or semicolon,
+ * surround with hashtags.
+ *
+ * e.g. Before: $ echo a; (echo b)
+ * 	After:  $ echo a#;## #(#echo b#)#
+ */
 void addHashtag(string& subCommand) {
     for (unsigned i = 0; i < subCommand.size(); i++) {
         if (subCommand.at(i) == '(') {
@@ -264,6 +271,11 @@ void addHashtag(string& subCommand) {
     }
 }
 
+/*
+ * Tokenize string input into inOrder notation by separating connectors and
+ * command arguments. Store inOrder notation into a queue called inOrder.
+ *
+ */
 void tokenizeInOrder(string& input, queue<string>& inOrder) {
     //Read input to a stream so split the commands
     stringstream stream(input);
@@ -278,19 +290,31 @@ void tokenizeInOrder(string& input, queue<string>& inOrder) {
     }
 }
 
+/*
+ * Read inOrder queue and convert to postOrder notation. Use stacks to keep
+ * track of where connectors should be placed.
+ *
+ */
 queue<string> tokenizePostOrder(queue<string> inOrder) {
     //Store connectors into connector stack
     stack<string> connector;
     //Store subcommands into postOrder queue
     queue<string> postOrder;
+	
+    //Read tokens from inOrder queue one at a time until queue becomes empty
     while (!inOrder.empty()) {
+	//Push token to postOrder queue if token is a command argument
         if (!isOperator(inOrder.front()) && !isParenthesis(inOrder.front())) {
             postOrder.push(inOrder.front());
         }
+	//Check if token is an operator that is not a parenthesis
         else if(isOperator(inOrder.front())) {
+	    //Add to empty stack if token is an operator that is not a parenthesis
             if(connector.empty()) {
                 goto addToStack;
             }
+	    //Pop stack onto postOrder as long as front of stack has same precedence 
+	    //as token. Then add token to top of stack.
             while(!isParenthesis(connector.top())) {
                 postOrder.push(connector.top());
                 connector.pop();
@@ -301,16 +325,22 @@ queue<string> tokenizePostOrder(queue<string> inOrder) {
             addToStack:
             connector.push(inOrder.front());
         }
+	//Push left parenthesis to top of stack if token is left parenthesis
         else if(inOrder.front() == "(") {
             connector.push(inOrder.front());
         }
+	//Check if token is right parenthesis
         else if(inOrder.front() == ")") {
+	    //Pop all operators in stack into postOrder until top of stack is 
+	    //left parenthesis
             while(connector.top() != "(") {
                 postOrder.push(connector.top());
                 connector.pop();
             }
+	    //Pop left parenthesis
             connector.pop();
         }
+	//Pop token from inOrder queue to check for next token
         inOrder.pop();
     }
     //Empty the stack into postOrder
