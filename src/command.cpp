@@ -1,6 +1,13 @@
 #include "command.h"
 #include <cstring>
 
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <unistd.h>
+
 Cmd::Cmd()
 {
   command = NULL;
@@ -137,39 +144,128 @@ bool ExitCmd::execute()
 ExitCmd::~ExitCmd(){}
 
 //===========================TEST========================
-
 TestCmd::TestCmd(string s){
 
-    //assuming parantheses count are checked
-//    char* list = new char [500];
-    int i = 0;
+
     argument = s;
-    if(s[0] == '[')
+    string p;
+    flag = string("");
+    bool flag_set = false;
+while(s.substr(0,1) == " ")
     {
-        argument = argument.substr(1,argument.find_first_of(']')-1); 
-        //[ commands
-        cout<<"argument: \""<<argument<<"\""<<endl;
+        s= s.substr(1,s.length());
     }
-    else if(s[0]=='t')
+    if(s.substr(0,1) == "[")
     {
-        //test
-        argument.substr(3, argument.length());
-        cout<<"argument: "<<argument<<endl;
+        //[ function ]
+        s = s.substr(1, s.length());
+        s = s.substr(0,s.find_last_of(']')-1);
+    }
+
+    if(s.substr(0,1) == "t")
+    {
+        //test flag path
+        string t = "test";
+        s= s.substr(t.length(),s.length());
+    }
+
+   while(s.length() != 0)
+    {
+        if(s.substr(0,1)== " ")
+        {
+            s=s.substr(1,s.length());
+        }
+
+        else{
+
+            string p = s.substr(0,s.find_first_of(" "));
+            if(p.substr(0,1) == "-" && flag == "")
+            {
+                //assume its the flag
+                flag = p;
+		flag_set = true;
+
+            }
+            else{
+
+                argumentList.push_back(p);
+
+            }
+
+             s = s.substr(p.length(), s.length());
+
+
+        }
+
+    }
+
+    if(!flag_set){
+	flag = "-e";
     }
 
 }
-
 TestCmd::~TestCmd(){}
 bool TestCmd::execute(){
 
-//    struct stat sb;
-////// if not given a flag
-//      if (argc != 2) {
-//           cout<<"(False)"<<endl;
-//           return false;
-//       }
+//  struct stat sb;
+  struct stat sb;
 
-//      if (stat(argv[1], &sb) == -1) {
+  if(argumentList.size() == 0)
+  {
+	cout<<"NO FILEPATH GVEN for "<<argument<<endl;
+	return false;
+  }
+  if(argumentList.size() > 1)
+  {
+  	cout<<"TOO MANY ARGUMENTS for "<<argument<<endl;
+	return false;
+  }
+  
+  int value = stat(argumentList[0].c_str(), &sb);
+
+  if(value == -1)
+  {
+  	cout<<"(False)"<<endl;
+	return false;
+  }
+  
+  if(flag =="-e")
+  {
+	cout<<"(True)"<<endl;
+	return true;
+  }
+
+ else if(flag == "-f")
+ {
+    if(S_ISREG(sb.st_mode))
+    {
+       cout<<"(True)"<<endl;
+       return true;
+    } 
+    else
+    {
+	cout<<"(False)"<<endl;
+	return false;
+    }
+ }
+
+ else if(flag == "-d")
+ {
+     if(S_ISDIR(sb.st_mode))
+      {
+        cout<<"(True)"<<endl;
+        return true;
+      }
+      else
+      {
+        cout<<"(False)"<<endl;
+        return false;
+      } 	
+ 
+ cout<<"(False)"<<endl;
+ return false;	
+ }
+//  if (stat(argv[1], &sb) == -1) {
 //           perror("stat");
 //           return false;
 //       }

@@ -67,6 +67,9 @@ class TestCmd:public Base
     bool execute();
   private:
     string argument;
+    string flag;
+    vector<string> argumentList;
+
 };
 
 

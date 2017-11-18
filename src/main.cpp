@@ -324,19 +324,19 @@ Base * exitorCommand(string s)
   //
   //
 
+  string p = string(val);
+  while(p.substr(0,1) == " ")
+	p = p.substr(1, p.length());
 
-  if(string(val)== "test" || string(val) == "[")
+  if(p == "test" || p == "[")
   {
 	//create a test object
-	
-	temp = new TestCmd(s);	
+ 	temp = new TestCmd(s);	
   }
-
-  if(string(val) == "exit" || string(val) == "Exit")
+  else if(p == "exit" || p  == "Exit")
   {
 	temp = new ExitCmd();
   }
-
   //create a command node
   else
   {
@@ -410,6 +410,7 @@ Base* generateTree(vector<string> v)
   //if there is not, then create an empty node to execute
   else
   {
+    cout<<"creating empty node"<<endl;
     Base * p = new Cmd();
     return p;
   }
