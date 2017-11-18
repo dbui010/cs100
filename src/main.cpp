@@ -129,7 +129,7 @@ void readCommandLine(string& input) {
  * Check to to see if the number of left parentheses matches the number of
  * right parentheses. Return an error message if the numbers do not match.
  * Also return an error message if a right parenthesis proceeds before a
- * left parenthesis.
+ * left parenthesis. Also perform same check for brackets.
  * 
  * e.g. $ (echo a || echo b) && (echo a || echo b) ==> valid output
  * 	$ (echo a || echo b && (echo a || echo b) ==> invalid output
@@ -168,7 +168,7 @@ bool isBalancedParentheses(string& input, char c) {
         else if (input.at(i) == ']') {
             checkBalance--;
             if (checkBalance < 0) {
-                cout << "ERROR: Left parenthesis must come "
+                cout << "ERROR: Left bracket must come "
                      << "before right brackets." << endl;
                 return 0;
             }
@@ -184,6 +184,17 @@ bool isBalancedParentheses(string& input, char c) {
   }
 
 }
+
+/*
+ * Read user's string of commands into a vector of substrings. Add hashtag
+ * to the left and right of all parentheses and connectors for tokenizing.
+ * Combine substrings together back into the input after all parentheses
+ * and connectors have surrounding hashtags.
+ *
+ * e.g. Before: $ (echo a || echo b) && echo c; (echo d || echo e)
+ * 	After:  $#(#echo a#||# echo b#)# #&&# echo c#;# #(#echo d#||# echo#)#
+ *
+ */
 void separateConnectors(string& input) {
     //Read input to a stream so split the commands
     stringstream stream(input);
