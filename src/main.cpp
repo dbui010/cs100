@@ -352,6 +352,10 @@ queue<string> tokenizePostOrder(queue<string> inOrder) {
     return postOrder;
 }
 
+/*
+ * Return true if string is a connector. Otherwise, return false.
+ *
+ */
 bool isOperator(string token){
     //Return true if string is a connector
     if(token == "&&" || token == "||" || token == ";") {
@@ -359,7 +363,10 @@ bool isOperator(string token){
     }
     return false;
 }
-
+/*
+ * Return true if string is a token. Otherwise, return false.
+ *
+ */
 bool isParenthesis(string token) {
     //Return false if string is a parenthesis
     if(token == "(" || token == ")") {
