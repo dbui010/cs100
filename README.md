@@ -8,7 +8,7 @@ Kevin Frazier, Dinh Bui
 
 git clone https://github.com/cs100/rshell-kd.git   
 cd rshell-kd/   
-git checkout assn2  
+git checkout assn3 
 cd src/   
 make   
 ./rshell   
